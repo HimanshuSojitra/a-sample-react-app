@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<title>Shopping Cart</title>
+    
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+	<script src="react.js"></script>
+	<script src="react-dom.js"></script>
+	<script src="babel-core-browser.js"></script>
+    <script src="jquery-2.2.1.js"></script>	
+
+	<style>
+        body{
+	       font-family: Arial;
+	       font-size: 14px;
+        }
+        .main {
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin: 0;
+        }
+        .header-menu {
+            margin-top: 20px;
+        }
+        .menu-link {
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .cntnt {
+            margin-top: 20px;
+        }
+        .glyphicon-star, .glyphicon-star-empty {
+            cursor: pointer;
+            margin: 0 2px;
+        }
+	</style>
+
+</head>
+<body>
+	<div id="example" class="main container-fluid"></div>
+	<script type="text/babel">
+        var products = [
+            {
+                name:"Apple",
+                code: 1,
+                rating: 5,
+                cost: 50
+            },
+            {
+                name:"Mango",
+                code: 2,
+                rating: 4,
+                cost: 80
+            },
+            {
+                name:"Orange",
+                code: 3,
+                rating: 3,
+                cost: 30
+            },
+            {
+                name:"Banana",
+                code: 4,
+                rating: 2,
+                cost: 10
+            }
+        ];
+        
+        class AddProductScreen extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {rating: 0};
+
+                //this.handleChange = this.handleChange.bind(this);
+                this.handleSubmit = this.handleSubmit.bind(this);
+                this.starClick = this.starClick.bind(this);
+            }
+
+          /*handleChange(event) {            
+            this.setState({value: event.target.value});
+          }*/
+          
+          starClick(event) {
+            var $ele = $(event.target); 
+            var id = +$ele.attr("id").substring(4);
+            //console.log(id);
+            for (var i = 1; i <= 5; i++) {
+                if( id === i ) {
+                    if ( $ele.hasClass( 'glyphicon-star-empty' ) ) {
+                        $ele.removeClass( 'glyphicon-star-empty' ).addClass( 'glyphicon-star' );
+                        this.setState({rating: id});                
+                    }
+                    else {
+                        $ele.addClass( 'glyphicon-star-empty' ).removeClass( 'glyphicon-star' );
+                        this.setState({rating: id});                
+                    }
+                }
+                else if( id < i ) {
+                    $('#star' + i).addClass( 'glyphicon-star-empty' ).removeClass( 'glyphicon-star' );
+                }
+                else if( id > i ) {
+                    $('#star' + i).removeClass( 'glyphicon-star-empty' ).addClass( 'glyphicon-star' );
+                }
+            }
+            
+          }
+          
+          handleSubmit(event) {
+            
+            //alert('A name was submitted: ' + $( '#productName' ).val());
+            //console.log('handleSubmit');
+            products.push({
+                code: products[products.length - 1].code + 1,
+                name: $( '#productName' ).val(),
+                cost: $( '#cost' ).val(),
+                rating: this.state.rating
+            });
+            console.log(JSON.stringify(products));
+            $( '#addProduct' ).hide();
+            $( '#productsList' ).show();
+            ReactDOM.render(
+                    <ProductsList/>,
+			         document.getElementById('productsList')
+                );
+            event.preventDefault();
+          }
+
+          render() {
+            return (
+                <form className="form-horizontal" onSubmit={this.handleSubmit}>
+                    <div className="form-group">                        
+                        <label for="productName" className="col-sm-4 control-label">Product Name</label>
+                        <div className="col-sm-4">
+                            <input type="text" className="form-control" id="productName" placeholder="Product Name"
+                             />
+                        </div>
+                        <div className="col-sm-4"></div>
+                    </div>
+                    <div className="form-group">
+                        <label for="price" className="col-sm-4 control-label">Cost</label>
+                        <div className="col-sm-4">
+                            <input type="text" className="form-control" id="cost" placeholder="Cost"/>
+                        </div>
+                        <div className="col-sm-4"></div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-4 control-label">Code</label>
+                        <div className="col-sm-4">
+                            {products[products.length - 1].code + 1}
+                        </div>
+                        <div className="col-sm-4"></div>
+                    </div>
+                    <div className="form-group">
+                        <label className="col-sm-4 control-label">Rating</label>
+                        <div className="col-sm-4">
+                            <i id="star1" className="glyphicon glyphicon-star-empty" onClick={this.starClick}></i>
+                            <i id="star2" className="glyphicon glyphicon-star-empty" onClick={this.starClick}></i>
+                            <i id="star3" className="glyphicon glyphicon-star-empty" onClick={this.starClick}></i>
+                            <i id="star4" className="glyphicon glyphicon-star-empty" onClick={this.starClick}></i>
+                            <i id="star5" className="glyphicon glyphicon-star-empty" onClick={this.starClick}></i>
+                        </div>
+                        <div className="col-sm-4"></div>
+                    </div>
+                    
+                  <div className="form-group">
+                    <div className="col-sm-offset-4 col-sm-8">
+                      <button type="submit" className="btn btn-default">Add</button>
+                    </div>
+                  </div>
+                </form>
+            );
+          }
+        }
+        
+        
+        
+        class ShoppingCart extends React.Component {
+            render() {
+                return (
+                    <div>
+                        <Header/>
+                        <Menu/>
+                    </div>
+                );
+            }
+        }
+        
+        class Header extends React.Component {
+            render() {
+                return (                    
+                    <h1>
+                       Shopping Cart
+                    </h1>                    
+                );
+            }
+        }
+        
+        class Menu extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {value: ''};
+
+                this.allProductsClick = this.allProductsClick.bind(this);                
+                this.addProductClick = this.addProductClick.bind(this);                                
+            }
+
+            allProductsClick(event) {
+                $( '#addProduct' ).hide();
+                $( '#productsList' ).show();
+                ReactDOM.render(
+                    <ProductsList/>,
+			         document.getElementById('productsList')
+                );
+            }
+            addProductClick(event) {                
+                $( '#addProduct' ).show();
+                $( '#productsList' ).hide();
+                ReactDOM.render(
+                    <AddProductScreen/>,
+			         document.getElementById('addProduct')
+                );
+            }
+            
+            render() {
+                return (
+                <div>
+                    <div className="row header-menu">
+                        <div className="col-lg-3"></div>
+                        <div className="col-lg-3 menu-link" onClick={this.allProductsClick}>
+                           All Products
+                        </div>
+                        <div className="col-lg-3 menu-link" onClick={this.addProductClick}>
+                           Add Product
+                        </div>
+                        <div className="col-lg-3"></div>
+                    </div>
+                    <div className="cntnt">
+                        <div id="productsList">                            
+                            <ProductsList/>
+                        </div>
+                        <div id="addProduct"></div>
+                    </div>
+                    </div>
+                
+                
+                
+                
+                );
+            }
+        }
+        
+        class Sort extends React.Component {   
+        
+            sort(field){            
+                this.props.sortBy(field);
+            }
+            render() {
+                return (
+                    <div className="sort-section">                        
+                        <div onClick={this.sort.bind(this,'name')}>Sort by Name</div>                        
+                    </div>
+                )
+            }
+        }
+        
+        class Rating extends React.Component {   
+            /**/
+            
+            
+            render() {
+            var indents = [];
+            for (var i = 0; i < this.props.rating; i++) {
+                indents.push(<i className="glyphicon glyphicon-star" key={i}></i>);
+            }
+                return (
+                    <div>{indents}</div>
+                )
+            }
+        }
+        
+        class ProductsList extends React.Component {       
+            constructor(props) {
+                super(props);                
+
+                this.sortBy = this.sortBy.bind(this);
+            }
+            sortBy(field){                
+                
+                function compare(a,b) {                
+                  if (a[field] < b[field]){
+                    return -1;
+                }
+                  if (a[field] > b[field]){
+                    return 1;
+                }
+                  return 0;
+                }
+                var sortedProducts = products.sort(compare);
+                console.log(JSON.stringify(products));
+                console.log(JSON.stringify(sortedProducts));
+                this.setState({
+                    products: sortedProducts
+                });
+                //console.log(JSON.stringify(products));
+            }
+            
+            render() {
+                // state must be inside render() and prefixed by this
+                this.state = {
+                    products: products // default state
+                }
+                
+                const productsList = products.map((product) => 
+                    <tr key={product.code}>
+                        <td key={product.code}>{product.code}</td>
+                        <td>{product.name}</td>
+                        <td>{product.cost}</td>
+                        <td>
+                            <Rating rating={product.rating}/>
+                        </td>                        
+                    </tr>
+                );
+                return (
+                    <div>
+                    <Sort sortBy={this.sortBy}/>
+                    <table className="table table-bordered">
+                        <thead><tr>
+                            <td>Product Code <span className="glyphicon glyphicon-arrow-up" onClick={this.sortBy.bind(this,'code')}></span></td>
+                            <td>Product Name <i className="glyphicon glyphicon-arrow-up" onClick={this.sortBy.bind(this,'name')}></i></td>
+                            <td>Cost <i className="glyphicon glyphicon-arrow-up" onClick={this.sortBy.bind(this,'cost')}></i></td>
+                            <td>Rating <i className="glyphicon glyphicon-arrow-up" onClick={this.sortBy.bind(this,'rating')}></i></td>                            
+                        </tr></thead>
+                        <tbody>
+                            {productsList}
+                        </tbody>
+                    </table>                    
+                    </div>
+                );
+            }
+        }
+        
+        
+		
+        ReactDOM.render(
+			<ShoppingCart/>,
+			document.getElementById('example')
+		);
+
+	</script>
+</body>
+</html>
